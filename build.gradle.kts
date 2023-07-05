@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "1.8.22"
+    id("maven-publish")
 }
 
 repositories {
@@ -29,5 +30,26 @@ kotlin {
 tasks.compileKotlin {
     kotlinOptions {
         allWarningsAsErrors = true
+    }
+}
+
+tasks {
+    val sourcesJar by creating(Jar::class) {
+        archiveClassifier.set("sources")
+        artifacts {
+            kotlinSourcesJar
+        }
+    }
+
+    artifacts {
+        archives(sourcesJar)
+    }
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            from(components["kotlin"])
+        }
     }
 }

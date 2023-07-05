@@ -1,37 +1,32 @@
 package dev.aohara.nimbuskms
 
-import com.nimbusds.jose.JOSEException
 import com.nimbusds.jose.JWSAlgorithm
+import com.nimbusds.jose.RemoteKeySourceException
 import com.nimbusds.jwt.SignedJWT
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import org.http4k.connect.amazon.kms.model.CustomerMasterKeySpec
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class KmsJwsVerifierTest {
 
-    private val key = newKey(CustomerMasterKeySpec.RSA_4096)
+    private val keyId = newKey(CustomerMasterKeySpec.RSA_4096)
+    private val verifier = KmsJwsVerifier(kms)
 
     @Test
     fun `sign and verify`() {
-        val jwt = key.signJwt(JWSAlgorithm.RS512)
-        key.verifyJwt(jwt) shouldBe true
+        val jwt = keyId.signJwt(JWSAlgorithm.RS512)
+
+        jwt.verify(verifier) shouldBe true
     }
 
     @Test
-    @Disabled("Fake KMS must only verify signatures of the correct key")
     fun `verification fails - invalid key`() {
-        val jwt = key.signJwt(alg = JWSAlgorithm.PS512)
-        newKey(CustomerMasterKeySpec.RSA_3072).verifyJwt(jwt) shouldBe false
-    }
+        val jwt = "eyJraWQiOiI1Y2E3YjlmMS00YWNlLTQ0YTktYmFmNS0yMjM2ZTA3OWRiNzgiLCJhbGciOiJQUzUxMiJ9.eyJpc3MiOiJkZXYuYW9oYXJhLm5pbWJ1c2ttcyIsInN1YiI6ImtyYXRvcyIsImV4cCI6MTY4NTM2NTIwMH0.TPBVr90ptbPFJ7qB4bLmw4YU5bckRYAovua4za6yY7DT-W0w1e0HOI3KS2sbgJ6nKk5BQvZBoRA9g8HHW18y-3rxme0tW6Eyl2UsDR_rPopEBQxDrAKg72ubzcbe4Sjs5WDzlXgeqi931fOdTMXaN072RF2-BwRGUU09EQbpm2ZUcBhjo_AswWCJROq2u9b512AgJ8ySWHur51S7lfdhgKKfuNqKIDSZ4UWkwh_11GH0Wtvse6GVz5ecWrOtcrmFWKKQR78HOfSxIX6z13Vo3vu0oFUgiX1yJN1673VxQEcU5uxr8gaE5drjy2Do5G8oP7Jm062WwRSIhgQTBRBvyg"
+            .let { SignedJWT.parse(it) }
 
-    @Test
-    fun `verification fails - unsupported algorithm`() {
-        val jwt = SignedJWT.parse("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")
-
-        shouldThrow<JOSEException> {
-            key.verifyJwt(jwt)
-        }.message shouldBe "Unsupported algorithm: HS256"
+        shouldThrow<RemoteKeySourceException> {
+            jwt.verify(verifier)
+        }.message shouldBe "{\"__type\":\"ResourceNotFoundException\",\"Message\":\"TrentService can't find the specified item.\"}"
     }
 }

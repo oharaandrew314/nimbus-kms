@@ -15,7 +15,6 @@ class KmsJwsVerifierFactory(
 ): JWSVerifierFactory, BaseJWSProvider(supportedJwsAlgorithms) {
 
     override fun createJWSVerifier(header: JWSHeader, key: Key): JWSVerifier {
-        val kmsKey = key.asKmsOrThrow()
-        return KmsJwsVerifier(kms, kmsKey.keyId)
+        return KmsJwsVerifier(kms)
     }
 }

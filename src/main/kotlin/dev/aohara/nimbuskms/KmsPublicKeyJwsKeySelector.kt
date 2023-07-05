@@ -22,6 +22,8 @@ import java.security.spec.X509EncodedKeySpec
  */
 class KmsPublicKeyJwsKeySelector<C: SecurityContext>(private val kms: KMS): JWSKeySelector<C> {
 
+    // TODO cache key
+
     override fun selectJWSKeys(header: JWSHeader, context: C?): List<Key> {
         val keyId = KMSKeyId.parseOrNull(header.keyID) ?: throw KeySourceException("${header.keyID} is not a valid KMS key id")
 

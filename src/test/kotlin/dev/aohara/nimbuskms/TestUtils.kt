@@ -18,6 +18,7 @@ import java.util.Date
 
 val kms = FakeKMS().client()
 val clock: Clock = Clock.fixed(Instant.parse("2023-05-29T12:00:00Z"), ZoneOffset.UTC)
+val signer = KmsJwsSigner(kms)
 
 fun newKey(
     spec: CustomerMasterKeySpec,
@@ -43,7 +44,6 @@ fun KmsKey.signJwt(
     iss: String = "dev.aohara.nimbuskms",
     expires: Instant = clock.instant() + Duration.ofHours(1)
 ): SignedJWT {
-    val signer = KmsJwsSigner(kms, keyId)
     val claimsSet = JWTClaimsSet.Builder()
         .subject(sub)
         .issuer(iss)
@@ -56,9 +56,4 @@ fun KmsKey.signJwt(
 
     return SignedJWT(header, claimsSet)
         .also { it.sign(signer) }
-}
-
-fun KMSKeyId.verifyJwt(jwt: SignedJWT): Boolean {
-    val verifier = KmsJwsVerifier(kms, this)
-    return jwt.verify(verifier)
 }

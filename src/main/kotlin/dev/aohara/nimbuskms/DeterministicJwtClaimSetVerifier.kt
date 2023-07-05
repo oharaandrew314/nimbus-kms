@@ -6,6 +6,9 @@ import com.nimbusds.jwt.proc.DefaultJWTClaimsVerifier
 import java.time.Clock
 import java.util.Date
 
+/**
+ * Allows the clock to be easily overridden for testing
+ */
 open class DeterministicJwtClaimSetVerifier(
     private val clock: Clock,
     exactMatchClaims: JWTClaimsSet = JWTClaimsSet.Builder().build(),

@@ -4,15 +4,17 @@ import com.nimbusds.jose.proc.SecurityContext
 import com.nimbusds.jwt.SignedJWT
 import com.nimbusds.jwt.proc.DefaultJWTProcessor
 import dev.aohara.nimbuskms.KmsPublicKeyJwsKeySelector
+import org.http4k.connect.amazon.core.model.KMSKeyId
 import org.http4k.connect.amazon.kms.Http
 import org.http4k.connect.amazon.kms.KMS
 
 fun main() {
     val kms = KMS.Http()
+    val kmsKeyId = KMSKeyId.of("your_key_id")
 
-    // to use the KMS public key, it's much simpler to use a JWTProcessor with the provided JWSKeySelector
+    // to verify with the KMS public key, use the provided key selector
     val processor = DefaultJWTProcessor<SecurityContext>().apply {
-        jwsKeySelector = KmsPublicKeyJwsKeySelector(kms)
+        jwsKeySelector = KmsPublicKeyJwsKeySelector(kms, kmsKeyId)
     }
 
     // parse the JWT

@@ -2,31 +2,24 @@ package dev.aohara.nimbuskms
 
 import com.nimbusds.jose.JOSEException
 import com.nimbusds.jose.JWSHeader
-import com.nimbusds.jose.KeySourceException
 import com.nimbusds.jose.proc.JWSKeySelector
 import com.nimbusds.jose.proc.SecurityContext
-import dev.forkhandles.values.parseOrNull
 import org.http4k.connect.amazon.core.model.KMSKeyId
 import org.http4k.connect.amazon.kms.KMS
 import org.http4k.connect.amazon.kms.getPublicKey
 import org.http4k.connect.amazon.kms.model.CustomerMasterKeySpec
-import java.security.Key
 import java.security.KeyFactory
 import java.security.spec.X509EncodedKeySpec
 
 /**
- * Download KMS public keys to verify signatures locally.
+ * Download KMS public key to verify signatures locally.
  *
  * Note: ECDSA keys require a cryptographic provider.  For example:
  * Security.addProvider(BouncyCastleProvider())
  */
-class KmsPublicKeyJwsKeySelector<C: SecurityContext>(private val kms: KMS): JWSKeySelector<C> {
+class KmsPublicKeyJwsKeySelector<C: SecurityContext>(private val kms: KMS, private val keyId: KMSKeyId): JWSKeySelector<C> {
 
-    // TODO cache key
-
-    override fun selectJWSKeys(header: JWSHeader, context: C?): List<Key> {
-        val keyId = KMSKeyId.parseOrNull(header.keyID) ?: throw KeySourceException("${header.keyID} is not a valid KMS key id")
-
+    private val publicKey by lazy {
         val publicKeyData = kms.getPublicKey(keyId).valueOrThrow()
         val keySpec = X509EncodedKeySpec(publicKeyData.PublicKey.decodedBytes())
 
@@ -37,7 +30,8 @@ class KmsPublicKeyJwsKeySelector<C: SecurityContext>(private val kms: KMS): JWSK
                 throw JOSEException("Unsupported key spec: ${publicKeyData.CustomerMasterKeySpec}")
         }
 
-        val publicKey = KeyFactory.getInstance(alg).generatePublic(keySpec)
-        return listOf(publicKey)
+        KeyFactory.getInstance(alg).generatePublic(keySpec)
     }
+
+    override fun selectJWSKeys(header: JWSHeader, context: C?) = listOf(publicKey)
 }

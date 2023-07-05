@@ -9,7 +9,6 @@ repositories {
 dependencies {
     kotlin("stdlib-jdk8")
     implementation(platform("org.http4k:http4k-connect-bom:5.0.1.0"))
-    implementation(platform("dev.forkhandles:forkhandles-bom:2.6.0.0"))
 
     api("com.nimbusds:nimbus-jose-jwt:9.31")
     api("org.http4k:http4k-connect-amazon-kms")
@@ -25,4 +24,10 @@ tasks.test {
 
 kotlin {
     jvmToolchain(11)
+}
+
+tasks.compileKotlin {
+    kotlinOptions {
+        allWarningsAsErrors = true
+    }
 }

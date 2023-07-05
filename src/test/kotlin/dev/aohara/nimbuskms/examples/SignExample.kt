@@ -13,9 +13,12 @@ import java.time.Instant
 import java.util.Date
 
 fun main() {
+    // Build KMS client and get key id
     val kms = KMS.Http()
-    val jwsSigner = KmsJwsSigner(kms)
-    val keyId = KMSKeyId.of("my_kms_key_id")
+    val kmsKeyId = KMSKeyId.of("my_kms_key_id")
+
+    // Build a basic signer
+    val jwsSigner = KmsJwsSigner(kms, kmsKeyId)
 
     // set all the JWT claims we want for our principal
     val claims = JWTClaimsSet.Builder()
@@ -25,10 +28,8 @@ fun main() {
         .expirationTime(Date.from(Instant.now() + Duration.ofHours(1)))
         .build()
 
-    // Configure the KMS key and algorithm to use for signing
-    val header = JWSHeader.Builder(JWSAlgorithm.RS256)
-        .keyID(keyId.value)  // important!  Necessary to load the key for signing and verifying
-        .build()
+    // Configure the algorithm to use for signing
+    val header = JWSHeader.Builder(JWSAlgorithm.RS256).build()
 
     // Build, sign, and serialize the JWT
     val jwt = SignedJWT(header, claims)

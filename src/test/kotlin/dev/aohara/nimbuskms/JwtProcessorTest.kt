@@ -11,13 +11,15 @@ class JwtProcessorTest {
 
     @Test
     fun `process jwt - verify with KMS`() {
+        val key1 = newKey(CustomerMasterKeySpec.RSA_2048)
+
         val processor = DefaultJWTProcessor<SecurityContext>().apply {
             jwtClaimsSetVerifier = DeterministicJwtClaimSetVerifier(clock)
             jwsVerifierFactory = KmsJwsVerifierFactory(kms)
-            jwsKeySelector = KmsJwsKeySelector()
+            jwsKeySelector = KmsJwsKeySelector(key1)
         }
 
-        val key1 = newKey(CustomerMasterKeySpec.RSA_2048)
+
         val jwt = key1.signJwt(JWSAlgorithm.RS256, sub = "kratos")
 
         val claims = processor.process(jwt, null)
@@ -26,12 +28,13 @@ class JwtProcessorTest {
 
     @Test
     fun `process jwt - verify with KMS public key`() {
+        val key1 = newKey(CustomerMasterKeySpec.RSA_2048)
+
         val processor = DefaultJWTProcessor<SecurityContext>().apply {
             jwtClaimsSetVerifier = DeterministicJwtClaimSetVerifier(clock)
-            jwsKeySelector = KmsPublicKeyJwsKeySelector(kms)
+            jwsKeySelector = KmsPublicKeyJwsKeySelector(kms, key1)
         }
 
-        val key1 = newKey(CustomerMasterKeySpec.RSA_2048)
         val jwt = key1.signJwt(JWSAlgorithm.RS256, sub = "Athena")
 
         val claims = processor.process(jwt, null)

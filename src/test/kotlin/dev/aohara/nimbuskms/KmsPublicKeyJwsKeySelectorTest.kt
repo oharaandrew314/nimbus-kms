@@ -12,14 +12,12 @@ import java.security.interfaces.RSAPublicKey
 
 class KmsPublicKeyJwsKeySelectorTest {
 
-    private val factory = KmsPublicKeyJwsKeySelector<SecurityContext>(kms)
-
     @Test
     fun `download and verify RSA key`() {
         val keyId = newKey(CustomerMasterKeySpec.RSA_2048)
-        val keyData = KmsKey(keyId, JWSAlgorithm.RS256)
+        val factory = KmsPublicKeyJwsKeySelector<SecurityContext>(kms, keyId)
 
-        val jwt = keyData.signJwt()
+        val jwt = keyId.signJwt(JWSAlgorithm.RS512)
 
         factory.selectJWSKeys(jwt.header, null)
             .shouldHaveSize(1)
@@ -30,9 +28,9 @@ class KmsPublicKeyJwsKeySelectorTest {
     @Disabled("Fake KMS must support ECDSA public key generation")
     fun `download and verify ECDSA key`() {
         val keyId = newKey(CustomerMasterKeySpec.ECC_NIST_P256)
-        val keyData = KmsKey(keyId, JWSAlgorithm.ES256)
+        val factory = KmsPublicKeyJwsKeySelector<SecurityContext>(kms, keyId)
 
-        val jwt = keyData.signJwt()
+        val jwt = keyId.signJwt(JWSAlgorithm.ES256)
 
         factory.selectJWSKeys(jwt.header, null)
             .shouldHaveSize(1)

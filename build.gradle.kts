@@ -22,7 +22,6 @@ dependencies {
     testImplementation("org.http4k:http4k-connect-amazon-kms-fake")
     testImplementation("io.kotest:kotest-assertions-core-jvm:_")
     testImplementation("org.bouncycastle:bcprov-jdk18on:_")
-    testImplementation("org.bouncycastle:bcpkix-jdk18on:_")
     testImplementation("dev.forkhandles:result4k-kotest:_")
 }
 

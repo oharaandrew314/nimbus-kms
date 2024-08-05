@@ -40,6 +40,12 @@ tasks.compileKotlin {
     }
 }
 
+tasks.jacocoTestReport {
+    reports {
+        xml.required.set(true)
+    }
+}
+
 mavenPublishing {
     configure(KotlinJvm(sourcesJar = true))
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, automaticRelease = true)

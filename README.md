@@ -8,7 +8,7 @@ Want to sign and verify JWTs without worrying about provisioning and guarding se
 This plugin for Nimbus JOSE+JWT will let you use Amazon KMS to do all the heavy lifting for you.
 
 The Amazon KMS communication is done with the featherweight and reflectionless, [http4k-connect](https://github.com/http4k/http4k-connect);
-making it well suited to serverless environments.
+making it well suited to serverless environments, and offers unreasonable testability.
 
 ## Requirements
 
@@ -114,4 +114,56 @@ val processor = DefaultJWTProcessor<SecurityContext>().apply {
 val jwt = SignedJWT.parse("abcdefgh123456")
 val claims = processor.process(jwt, null)
 println(claims.subject)
+```
+
+## Test Support
+
+This plugin's Amazon KMS communication is built on [http4k-connect](https://github.com/http4k/http4k-connect),
+which provides an unreasonable level of testability.
+
+Just add the fake KMS library
+
+```kotlin
+// build.gradle.kts
+testImplementation("org.http4k:http4k-connect-amazon-kms-fake")
+```
+
+```kotlin
+class MyTest {
+    // start an in-memory fake KMS server
+    private val kms = FakeKms().client()
+
+    // use fake KMS to create a key
+    private val keyId = kms.createKey(CustomerMasterKeySpec.RSA_2048, KeyUsage.SIGN_VERIFY)
+        .shouldBeSuccess()
+        .KeyMetadata.KeyId
+
+    // use fake KMS to sign a JWT
+    private fun signJwt(subject: String): SignedJwt {
+        val claimsSet = JWTClaimsSet.Builder()
+            .subject(subject)
+            .build()
+
+        val header = JWSHeader.Builder(alg).build()
+
+        val signer = KmsJwsSigner(kms, keyId)
+        return SignedJWT(header, claimsSet).apply {
+            sign(signer)
+        }
+    }
+
+    @Test
+    fun `make authorized service call`() {
+        val jwt = signJwt("user1")
+
+        // Your app will use the injected fake KMS to verify JWTs
+        val myApp = createMyApp(
+            kmsClient = kms,
+            kmsKeyId = keyId
+        )
+
+        // make a full service call to your app
+        myApp.getProfile(jwt).name shouldBe "User One"
+    }
+}
 ```

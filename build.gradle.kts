@@ -16,10 +16,10 @@ dependencies {
     implementation(platform("org.http4k:http4k-connect-bom:_"))
 
     api("com.nimbusds:nimbus-jose-jwt:_")
-    api("org.http4k:http4k-connect-amazon-kms:_")
+    api("org.http4k:http4k-connect-amazon-kms")
 
     testImplementation(kotlin("test"))
-    testImplementation("org.http4k:http4k-connect-amazon-kms-fake:_")
+    testImplementation("org.http4k:http4k-connect-amazon-kms-fake")
     testImplementation("io.kotest:kotest-assertions-core-jvm:_")
     testImplementation("org.bouncycastle:bcprov-jdk18on:_")
     testImplementation("org.bouncycastle:bcpkix-jdk18on:_")

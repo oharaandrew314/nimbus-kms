@@ -50,11 +50,11 @@ mavenPublishing {
     configure(KotlinJvm(sourcesJar = true))
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, automaticRelease = true)
     signAllPublications()
-    coordinates("dev.andrewohara", "nimbus-kms", "0.1")
+    coordinates("dev.andrewohara", "nimbus-kms", "0.1.1")
 
     pom {
         name.set("Nimbus KMS")
-        description.set("Collection of useful kotlin microservice utilities")
+        description.set("CProvide KMS sign/verify for Nimbus JOSE+JWT")
         inceptionYear.set("2023")
         url.set("https://github.com/oharaandrew314/nimbus-kms")
         licenses {

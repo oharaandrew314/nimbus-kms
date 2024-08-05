@@ -4,7 +4,7 @@ import com.nimbusds.jose.JWSAlgorithm
 import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
-import dev.forkhandles.result4k.onFailure
+import dev.forkhandles.result4k.kotest.shouldBeSuccess
 import org.http4k.connect.amazon.core.model.KMSKeyId
 import org.http4k.connect.amazon.kms.FakeKMS
 import org.http4k.connect.amazon.kms.createKey
@@ -24,7 +24,7 @@ fun newKey(
     usage: KeyUsage = KeyUsage.SIGN_VERIFY
 ): KMSKeyId {
     return kms.createKey(spec, usage)
-        .onFailure { error(it) }
+        .shouldBeSuccess()
         .KeyMetadata.KeyId
 }
 
@@ -45,6 +45,7 @@ fun KMSKeyId.signJwt(
 
     val signer = KmsJwsSigner(kms, this)
 
-    return SignedJWT(header, claimsSet)
-        .also { it.sign(signer) }
+    return SignedJWT(header, claimsSet).apply {
+        sign(signer)
+    }
 }

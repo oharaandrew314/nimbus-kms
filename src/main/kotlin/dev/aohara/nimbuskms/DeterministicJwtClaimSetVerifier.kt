@@ -9,7 +9,7 @@ import java.util.Date
 /**
  * Allows the clock to be easily overridden for testing
  */
-open class DeterministicJwtClaimSetVerifier(
+class DeterministicJwtClaimSetVerifier(
     private val clock: Clock,
     exactMatchClaims: JWTClaimsSet = JWTClaimsSet.Builder().build(),
     requiredClaims: Set<String> = emptySet(),

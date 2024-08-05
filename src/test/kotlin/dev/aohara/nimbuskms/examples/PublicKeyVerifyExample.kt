@@ -12,7 +12,7 @@ fun main() {
     val kms = KMS.Http()
     val kmsKeyId = KMSKeyId.of("your_key_id")
 
-    // to verify with the KMS public key, use the provided key selector
+    // to verify with the KMS public key, the provided key selector simplifies the process
     val processor = DefaultJWTProcessor<SecurityContext>().apply {
         jwsKeySelector = KmsPublicKeyJwsKeySelector(kms, kmsKeyId)
     }

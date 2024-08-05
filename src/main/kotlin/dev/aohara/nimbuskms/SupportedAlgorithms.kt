@@ -16,7 +16,9 @@ private val supportedAlgorithms = mapOf(
     JWSAlgorithm.PS512 to SigningAlgorithm.RSASSA_PSS_SHA_512
 )
 
-val supportedJwsAlgorithms get() = supportedAlgorithms.keys
+internal val supportedJwsAlgorithms get() = supportedAlgorithms.keys
 
-fun JWSAlgorithm.toHttp4kOrThrow() = supportedAlgorithms[this] ?: throw JOSEException("Unsupported algorithm: $this")
+internal fun JWSAlgorithm.toHttp4kOrThrow() = supportedAlgorithms[this] ?: throw JOSEException("Unsupported algorithm: $this")
+
+internal fun SigningAlgorithm.isEcdsa() = this == SigningAlgorithm.ECDSA_SHA_256 || this == SigningAlgorithm.ECDSA_SHA_384 || this == SigningAlgorithm.ECDSA_SHA_512
 

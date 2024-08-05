@@ -7,6 +7,9 @@
 Want to sign and verify JWTs without worrying about provisioning and guarding sensitive private keys?
 This plugin for Nimbus JOSE+JWT will let you use Amazon KMS to do all the heavy lifting for you.
 
+The Amazon KMS communication is done with the featherweight and reflectionless, [http4k-connect](https://github.com/http4k/http4k-connect);
+making it well suited to serverless environments.
+
 ## Requirements
 
 Java 11, 17, and 21 are officially supported.

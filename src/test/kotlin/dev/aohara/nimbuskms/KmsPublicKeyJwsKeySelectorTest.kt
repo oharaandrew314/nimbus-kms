@@ -24,7 +24,7 @@ class KmsPublicKeyJwsKeySelectorTest {
 
         val jwt = keyId.signJwt(JWSAlgorithm.RS512)
 
-        val publicKey = selector.selectJWSKeys(jwt.header, null)
+        val publicKey = selector.selectJWSKeys(null, null)
             .shouldHaveSize(1)
             .first().shouldBeInstanceOf<RSAPublicKey>()
 
@@ -37,10 +37,8 @@ class KmsPublicKeyJwsKeySelectorTest {
         val keyId = newKey(CustomerMasterKeySpec.ECC_NIST_P256)
         val selector = KmsPublicKeyJwsKeySelector<SecurityContext>(kms, keyId)
 
-        val jwt = keyId.signJwt(JWSAlgorithm.ES256)
-
         shouldThrow<NoSuchAlgorithmException> {
-            selector.selectJWSKeys(jwt.header, null)
+            selector.selectJWSKeys(null, null)
         }
     }
 
@@ -51,7 +49,7 @@ class KmsPublicKeyJwsKeySelectorTest {
 
         val jwt = keyId.signJwt(JWSAlgorithm.ES512)
 
-        val publicKey = selector.selectJWSKeys(jwt.header, null)
+        val publicKey = selector.selectJWSKeys(null, null)
             .shouldHaveSize(1)
             .first().shouldBeInstanceOf<ECPublicKey>()
 

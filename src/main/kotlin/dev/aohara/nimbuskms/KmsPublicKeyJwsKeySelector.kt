@@ -10,7 +10,6 @@ import org.http4k.connect.amazon.kms.getPublicKey
 import org.http4k.connect.amazon.kms.model.CustomerMasterKeySpec
 import java.security.KeyFactory
 import java.security.Provider
-import java.security.interfaces.ECPublicKey
 import java.security.spec.X509EncodedKeySpec
 
 /**
@@ -36,11 +35,9 @@ class KmsPublicKeyJwsKeySelector<C: SecurityContext>(
                 throw JOSEException("Unsupported key spec: ${publicKeyData.KeySpec}")
         }
 
-//        ECPublicKey
-
         val keyFactory = if (provider == null) KeyFactory.getInstance(alg) else KeyFactory.getInstance(alg, provider)
         keyFactory.generatePublic(keySpec)
     }
 
-    override fun selectJWSKeys(header: JWSHeader, context: C?) = listOf(publicKey)
+    override fun selectJWSKeys(header: JWSHeader?, context: C?) = listOf(publicKey)
 }
